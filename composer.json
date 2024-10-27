@@ -1,5 +1,5 @@
 {
-    "name": "salienture-cakephp-cors-plugin",
+    "name": "salienture/salienture-cakephp-cors-plugin",
     "description": "Salienture CakePHP 5 CORS Plugin",
     "type": "cakephp-plugin",
     "license": "MIT",
