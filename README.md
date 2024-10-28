@@ -19,7 +19,7 @@
 You can install the plugin using Composer by running the following command at the root of your CakePHP 5 project:
 
 ```bash
-composer require salienture/cakephp-cors-plugin
+composer require salienture/salienture-cakephp-cors-plugin
 ```
 
 ### 2. Load the Plugin
@@ -53,6 +53,8 @@ public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
 }
 ```
 
+By default it's added in **middleware()** to the **CorsPlugin.php** file. 
+
 ### 4. Configure CORS Settings
 
 You can define the CORS configuration in your `config/app.php` or `config/cors.php` file. Here's an example configuration:
@@ -62,7 +64,7 @@ return [
     'Cors' => [
         'allowOrigin' => ['*'], // Array of allowed origins, or '*' for all origins.
         'allowMethods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // HTTP methods to allow.
-        'allowHeaders' => ['Authorization', 'Content-Type'], // Headers allowed in the request.
+        'allowHeaders' => ['Authorization', 'X-Requested-With', 'Origin', 'Content-Type', 'Accept'], // Headers allowed in the request.
         'exposeHeaders' => ['Link'], // Headers that can be exposed to the browser.
         'maxAge' => 3600, // Time in seconds for how long the results of a preflight request can be cached.
         'credentials' => true, // Whether to allow cookies and credentials.

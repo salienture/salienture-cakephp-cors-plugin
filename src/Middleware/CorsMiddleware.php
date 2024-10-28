@@ -49,7 +49,7 @@ class CorsMiddleware implements MiddlewareInterface
      */
     protected function isCorsApplicable(ServerRequestInterface $request): bool
     {
-        // Apply for all requested url
+        // CORS is applied to all requests.
         return true;
     }
 
@@ -101,7 +101,16 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $allowedOrigins = $corsConfig['allowOrigin'] ?? ['*'];
 
-        // Check if the request's Origin is allowed
+        // If allowOrigin is a boolean
+        if (is_bool($allowedOrigins)) {
+            if ($allowedOrigins) {
+                return $response->withHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+            } else {
+                return $response->withHeader('Access-Control-Allow-Origin', ''); // Disallow all origins
+            }
+        }
+
+        // If allowOrigin is an array, apply the appropriate logic
         $origin = $request->getHeaderLine('Origin');
         if (in_array('*', $allowedOrigins) || in_array($origin, $allowedOrigins)) {
             return $response->withHeader('Access-Control-Allow-Origin', $origin);
@@ -121,14 +130,12 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $allowedMethods = $corsConfig['allowMethods'] ?? ['GET', 'POST', 'OPTIONS'];
 
-        return $response->withHeader(
-            'Access-Control-Allow-Methods',
-            implode(',', $allowedMethods)
-        );
+        return $response->withHeader('Access-Control-Allow-Methods', implode(',', $allowedMethods));
     }
 
     /**
      * Set the Access-Control-Allow-Headers header.
+     * Handle cases where allowHeaders is either an array or boolean.
      *
      * @param ResponseInterface $response
      * @param array $corsConfig
@@ -136,16 +143,24 @@ class CorsMiddleware implements MiddlewareInterface
      */
     protected function setAllowHeadersHeader(ResponseInterface $response, array $corsConfig): ResponseInterface
     {
-        $allowedHeaders = $corsConfig['allowHeaders'] ?? ['Authorization', 'Content-Type'];
+        $allowedHeaders = $corsConfig['allowHeaders'] ?? true;
 
-        return $response->withHeader(
-            'Access-Control-Allow-Headers',
-            implode(',', $allowedHeaders)
-        );
+        // If allowHeaders is true, allow all headers
+        if (is_bool($allowedHeaders)) {
+            if ($allowedHeaders) {
+                return $response->withHeader('Access-Control-Allow-Headers', '*');
+            } else {
+                return $response->withHeader('Access-Control-Allow-Headers', '');
+            }
+        }
+
+        // If allowHeaders is an array, allow specific headers
+        return $response->withHeader('Access-Control-Allow-Headers', implode(',', $allowedHeaders));
     }
 
     /**
      * Set the Access-Control-Expose-Headers header.
+     * Handle cases where exposeHeaders is either an array or boolean.
      *
      * @param ResponseInterface $response
      * @param array $corsConfig
@@ -153,12 +168,19 @@ class CorsMiddleware implements MiddlewareInterface
      */
     protected function setExposeHeadersHeader(ResponseInterface $response, array $corsConfig): ResponseInterface
     {
-        $exposeHeaders = $corsConfig['exposeHeaders'] ?? [];
+        $exposeHeaders = $corsConfig['exposeHeaders'] ?? false;
 
-        return $response->withHeader(
-            'Access-Control-Expose-Headers',
-            implode(',', $exposeHeaders)
-        );
+        // If exposeHeaders is true, expose all headers
+        if (is_bool($exposeHeaders)) {
+            if ($exposeHeaders) {
+                return $response->withHeader('Access-Control-Expose-Headers', '*');
+            } else {
+                return $response->withHeader('Access-Control-Expose-Headers', '');
+            }
+        }
+
+        // If exposeHeaders is an array, expose specific headers
+        return $response->withHeader('Access-Control-Expose-Headers', implode(',', $exposeHeaders));
     }
 
     /**
@@ -171,6 +193,7 @@ class CorsMiddleware implements MiddlewareInterface
     protected function setCredentialsHeader(ResponseInterface $response, array $corsConfig): ResponseInterface
     {
         $credentials = $corsConfig['credentials'] ?? false;
+
         return $response->withHeader('Access-Control-Allow-Credentials', $credentials ? 'true' : 'false');
     }
 
@@ -184,6 +207,7 @@ class CorsMiddleware implements MiddlewareInterface
     protected function setMaxAgeHeader(ResponseInterface $response, array $corsConfig): ResponseInterface
     {
         $maxAge = $corsConfig['maxAge'] ?? 3600;
+
         return $response->withHeader('Access-Control-Max-Age', (string)$maxAge);
     }
 }

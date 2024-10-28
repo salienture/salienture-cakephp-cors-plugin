@@ -38,5 +38,5 @@
         "cs-check": "vendor/bin/phpcs --colors -p -s --extensions=php src/ tests/",
         "cs-fix": "vendor/bin/phpcbf --colors -p -s --extensions=php src/ tests/"
     },
-    "minimum-stability": "dev"
+    "prefer-stable": true
 }

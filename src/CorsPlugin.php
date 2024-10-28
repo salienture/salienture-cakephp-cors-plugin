@@ -5,7 +5,6 @@ namespace Salienture\Cors;
 
 use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
-use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Core\PluginApplicationInterface;
 use Cake\Http\MiddlewareQueue;
@@ -29,16 +28,6 @@ class CorsPlugin extends BasePlugin
      */
     public function bootstrap(PluginApplicationInterface $app): void
     {
-        // Load default configuration file
-        Configure::load('Salienture\Cors.default');
-
-        // Merge `default` and `custom` local config from the `app_local.php` file.
-        $defaultCorsConfig = Configure::consume('Salienture\Cors.default');
-        $localCorsConfig = Configure::consume('Cors');
-        $cors = array_merge($defaultCorsConfig, $localCorsConfig);
-
-        // Write `Cors` configurations
-        Configure::write('Cors', $cors);
     }
 
     /**
@@ -72,11 +61,7 @@ class CorsPlugin extends BasePlugin
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
-        try {
-            $middlewareQueue->insertBefore(RoutingMiddleware::class, new CorsMiddleware());
-        } catch (\LogicException $exception) {
-            $middlewareQueue->add(new CorsMiddleware());
-        }
+        $middlewareQueue->insertBefore(RoutingMiddleware::class, new CorsMiddleware());
 
         return $middlewareQueue;
     }
