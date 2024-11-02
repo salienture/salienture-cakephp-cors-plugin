@@ -24,55 +24,61 @@ composer require salienture/salienture-cakephp-cors-plugin
 
 ### 2. Load the Plugin
 
-After installation, load the plugin by adding the following line in your `Application.php` file (`src/Application.php`):
+After installation, load the plugin:
 
-```php
-public function bootstrap(): void
-{
-    parent::bootstrap();
-    
-    // Load the Salienture CakePHP 5 CORS Plugin
-    $this->addPlugin('Salienture/Cors');
-}
+```bash
+bin/cake plugin load Salienture/Cors
 ```
 
-### 3. Add Middleware
+### 3. Configure CORS Settings
 
-Add the middleware to your CakePHP 5 application's middleware stack to enable CORS functionality. You can do this in the `Application.php` file:
-
-```php
-use Salienture\Cors\Middleware\CorsMiddleware;
-
-public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
-{
-    $middlewareQueue
-        // Add the CORS Middleware
-        ->add(new CorsMiddleware());
-
-    return $middlewareQueue;
-}
-```
-
-By default it's added in **middleware()** to the **CorsPlugin.php** file. 
-
-### 4. Configure CORS Settings
-
-You can define the CORS configuration in your `config/app.php` or `config/cors.php` file. Here's an example configuration:
+You can define the CORS configuration in your `config/app_local.php` file. Here's an example configuration:
 
 ```php
-return [
-    'Cors' => [
-        'allowOrigin' => ['*'], // Array of allowed origins, or '*' for all origins.
-        'allowMethods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // HTTP methods to allow.
-        'allowHeaders' => ['Authorization', 'X-Requested-With', 'Origin', 'Content-Type', 'Accept'], // Headers allowed in the request.
-        'exposeHeaders' => ['Link'], // Headers that can be exposed to the browser.
-        'maxAge' => 3600, // Time in seconds for how long the results of a preflight request can be cached.
-        'credentials' => true, // Whether to allow cookies and credentials.
-    ],
-];
+/**
+ * CORS configuration settings.
+ *
+ * This configuration controls the behavior of Cross-Origin Resource Sharing (CORS) 
+ * in the application. It defines the allowed origins, methods, headers, and other
+ * related settings for managing CORS requests.
+ *
+ * @return array The CORS configuration array.
+ *
+ * - 'allowOrigin': array|string
+ *      Defines the origins that are allowed to access the server's resources. 
+ *      Can be a specific domain (e.g., 'https://example.com') or '*' to allow all origins.
+ *
+ * - 'allowMethods': array
+ *      Lists the HTTP methods that are allowed for cross-origin requests.
+ *      Common methods include 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'.
+ *
+ * - 'allowHeaders': array
+ *      Specifies which headers can be included in the CORS request. For example, 
+ *      'Authorization' and 'Content-Type' are commonly used headers in API requests.
+ *
+ * - 'exposeHeaders': array
+ *      Lists the headers that are safe to expose to the client (browser). These headers
+ *      can be made visible via JavaScript on the client side.
+ *
+ * - 'maxAge': int
+ *      Indicates how long the results of a preflight request can be cached by the client, 
+ *      in seconds. A value of 3600 seconds (1 hour) is typically used.
+ *
+ * - 'credentials': bool
+ *      A boolean value that indicates whether credentials (such as cookies, 
+ *      authorization headers, or TLS client certificates) are allowed in cross-origin requests.
+ */
+'Cors' => [
+    'allowOrigin' => ['http://localhost:3000'], // Array of allowed origins, or '*' for all origins.
+    'allowMethods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // HTTP methods to allow.
+    'allowHeaders' => ['X-Requested-With', 'Content-Type', 'Authorization'], // Headers allowed in the request. 'true' for all headers. e.g. ['Authorization', 'Content-Type']
+    'exposeHeaders' => ['Link'], // Headers that can be exposed to the browser.
+    'maxAge' => 3600, // Time in seconds for how long the results of a preflight request can be cached.
+    'credentials' => true, // Whether to allow cookies and credentials.
+],
 ```
 
-### 5. Enable or Disable CORS for Specific Routes (Optional)
+### 4. Enable or Disable CORS for Specific Routes (Optional)
 
 If you want to enable or disable CORS on specific routes, you can configure it in the `routes.php` file using route scoping:
 
@@ -80,6 +86,9 @@ If you want to enable or disable CORS on specific routes, you can configure it i
 use Salienture\Cors\Middleware\CorsMiddleware;
 
 $routes->scope('/api', function (RouteBuilder $routes) {
+    // Set the default content type to JSON for the /api routes
+    $builder->setExtensions(['json']);
+
     // Add CORS Middleware for the /api routes
     $routes->registerMiddleware('cors', new CorsMiddleware());
     $routes->applyMiddleware('cors');
